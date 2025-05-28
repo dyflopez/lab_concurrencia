@@ -1,0 +1,17 @@
+name: Dispatcher
+
+on:
+  push:
+
+jobs:
+  queue_commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create issue for commit
+        uses: peter-evans/create-issue@v5
+        with:
+          title: "En cola: ${{ github.sha }}"
+          body: |
+            SHA: `${{ github.sha }}`
+            Autor: `${{ github.actor }}`
+          labels: queue
