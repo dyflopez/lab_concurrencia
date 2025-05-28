@@ -2,6 +2,7 @@ name: Concurrency Test
 
 on:
   workflow_dispatch:
+  push:
 
 concurrency:
   group: dummy-test-lock
@@ -19,4 +20,3 @@ jobs:
 
       - name: Done
         run: echo "✅ Job finalizado."
-#dan
