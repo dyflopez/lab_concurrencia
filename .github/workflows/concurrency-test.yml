@@ -1,0 +1,21 @@
+name: Concurrency Test
+
+on:
+  workflow_dispatch:  # 👈 Esto permite ejecutarlo manualmente
+
+concurrency:
+  group: dummy-test-lock
+  cancel-in-progress: false
+
+jobs:
+  wait-a-bit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Start
+        run: echo "⏳ Iniciando job..."
+
+      - name: Sleep for 80 seconds
+        run: sleep 80
+
+      - name: Done
+        run: echo "✅ Job finalizado."
