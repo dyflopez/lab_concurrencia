@@ -5,7 +5,7 @@ on:
   push:
 
 concurrency:
-  group: dummy-test-lock
+  group: dummy-test-lock-${{ github.run_id }}
   cancel-in-progress: false
 
 jobs:
