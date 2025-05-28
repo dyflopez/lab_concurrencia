@@ -5,7 +5,7 @@ on:
   push:
 
 concurrency:
-  group: dummy-test-lock-${{ github.run_id }}
+  group: dummy-test-lock
   cancel-in-progress: false
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
         run: echo "⏳ Iniciando job..."
 
       - name: Sleep for 80 seconds
-        run: sleep 80
+        run: sleep 90
 
       - name: Done
         run: echo "✅ Job finalizado."
