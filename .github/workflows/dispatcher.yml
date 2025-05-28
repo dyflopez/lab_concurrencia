@@ -1,17 +1,17 @@
-name: Dispatcher
+name: Encolar commits
 
 on:
   push:
 
 jobs:
-  queue_commit:
+  enqueue:
     runs-on: ubuntu-latest
     steps:
-      - name: Create issue for commit
+      - name: Crear issue para commit
         uses: peter-evans/create-issue@v5
         with:
-          title: "En cola: ${{ github.sha }}"
+          title: "Deploy pendiente: ${{ github.sha }}"
           body: |
-            SHA: `${{ github.sha }}`
+            Commit: `${{ github.sha }}`
             Autor: `${{ github.actor }}`
           labels: queue
