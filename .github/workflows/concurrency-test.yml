@@ -1,23 +1,14 @@
-name: Concurrency Test
+name: Despliegue Real
 
 on:
-  workflow_dispatch:
-  push:
-
-concurrency:
-  group: dummy-test-lock
-  cancel-in-progress: false
+  repository_dispatch:
+    types: [deploy_from_queue]
 
 jobs:
-  wait-a-bit:
+  real_deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Start
-        run: echo "⏳ Iniciando job..."
-
-      - name: Sleep for 80 seconds
-        run: sleep 90
-
-      - name: Done
-        run: echo "✅ Job finalizado."
-        #test daniel
+      - name: Iniciar despliegue
+        run: |
+          echo "🚀 Desplegando commit ${{ github.event.client_payload.sha }}"
+          sleep 90  # Reemplazá esto por tu lógica real de build/deploy
