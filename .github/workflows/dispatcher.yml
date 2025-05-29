@@ -3,12 +3,16 @@ name: Encolar commits
 on:
   push:
 
+permissions:
+  contents: write
+  issues: write
+
 jobs:
   enqueue:
     runs-on: ubuntu-latest
     steps:
       - name: Crear issue para commit
-        uses: peter-evans/create-issue@v4  # 🔧 corregido
+        uses: peter-evans/create-issue@v4
         with:
           title: "Deploy pendiente: ${{ github.sha }}"
           body: |
