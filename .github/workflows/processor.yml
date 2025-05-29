@@ -1,0 +1,69 @@
+name: Procesar despliegue
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/1 * * * *'
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    environment: test  # 👈 Esto permite usar el secret PAT_WORKFLOW
+
+    steps:
+      - name: Buscar primer issue pendiente
+        id: buscar
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'queue',
+              state: 'open',
+              sort: 'created',
+              direction: 'asc'
+            });
+
+            if (issues.data.length === 0) {
+              core.setOutput('found', 'false');
+              return;
+            }
+
+            const issue = issues.data[0];
+            const match = issue.body.match(/Commit: `(.*?)`/);
+            const sha = match ? match[1] : null;
+
+            core.setOutput('found', 'true');
+            core.setOutput('issue_number', issue.number);
+            core.setOutput('sha', sha);
+
+      - name: Salir si no hay deploys pendientes
+        if: steps.buscar.outputs.found == 'false'
+        run: echo "✅ No hay nada en cola"
+
+      - name: Ejecutar deploy real
+        if: steps.buscar.outputs.found == 'true'
+        run: |
+          echo "🚀 Desplegando commit: ${{ steps.buscar.outputs.sha }}"
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.PAT_WORKFLOW }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/dispatches \
+            -d '{"event_type": "deploy_from_queue", "client_payload": {"sha": "${{ steps.buscar.outputs.sha }}"}}'
+
+      - name: Cerrar issue
+        if: steps.buscar.outputs.found == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ steps.buscar.outputs.issue_number }},
+              state: 'closed'
+            });
